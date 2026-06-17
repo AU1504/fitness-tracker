@@ -1,0 +1,78 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Table user {
+  id integer [primary key, not null]
+  name varchar [not null]
+}
+
+Table user_program {
+  user_id int [ref: > user.id, not null]
+  program_id int [ref: > program.id, not null]
+  week int
+  progression int
+
+  indexes {
+    (user_id, program_id) [pk]
+  }
+}
+
+Table program {
+  id int [primary key]
+  name varchar [not null]
+  description varchar
+}
+
+Table workout {
+  id int [primary key]
+  program_id int [ref: > program.id, not null]
+  program_day int
+  comments varchar
+}
+
+Table workout_exercise {
+  id int [primary key]
+  workout_id int [ref: > workout.id, not null]
+  exercise_def_id int [ref: > exercise_definition.id, not null]
+  exercise_order int
+  planned_sets int
+  planned_reps int
+}
+
+Table session {
+  id int [primary key]
+  workout_id int [ref: > workout.id, not null]
+  comments varchar
+  completed bool
+  date datetime
+}
+
+Table session_exercise {
+  id int [primary key]
+  session_id int [ref: > session.id, not null]
+  exercise_def_id int [ref: > exercise_definition.id, not null]
+  exercise_order int
+  planned_sets int
+  planned_reps int
+}
+
+Table workout_set {
+  id int [primary key]
+  session_exercise_id int [ref: > session_exercise.id, not null]
+  reps int
+  weight float
+  comments varchar
+}
+
+Table exercise_definition {
+  id int [primary key]
+  name varchar [not null]
+  description varchar
+}
+
+Table pr {
+  id int [primary key]
+  user_id int [ref: > user.id, not null]
+  exercise_def_id int [ref: > exercise_definition.id, not null]
+  set_id int [ref: > workout_set.id, not null]
+}
