@@ -21,6 +21,8 @@ from app.models.program import Program
 from app.models.user_program import UserProgram
 from app.models.workout import Workout
 from app.models.workout_exercise import WorkoutExercise
+from app.models.session import Session
+from app.models.session_exercise import SessionExercise
 
 target_metadata = SQLModel.metadata
 
