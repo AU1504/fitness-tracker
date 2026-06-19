@@ -23,6 +23,8 @@ from app.models.workout import Workout
 from app.models.workout_exercise import WorkoutExercise
 from app.models.session import Session
 from app.models.session_exercise import SessionExercise
+from app.models.workout_set import WorkoutSet
+from app.models.pr import Pr
 
 target_metadata = SQLModel.metadata
 
