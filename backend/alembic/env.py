@@ -13,8 +13,12 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 load_dotenv()
 
+# adding the models so that Alembic can find them
 from sqlmodel import SQLModel
 from app.models.exercise_definition import ExerciseDefinition
+from app.models.user import User
+from app.models.program import Program
+from app.models.user_program import UserProgram
 
 target_metadata = SQLModel.metadata
 
