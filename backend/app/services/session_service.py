@@ -6,7 +6,7 @@ from app.models.session import Session as WorkoutSession
 from app.models.session_exercise import SessionExercise
 from app.models.exercise_definition import ExerciseDefinition
 from app.schemas.session import SessionStartResponse
-from app.schemas.workout import WorkoutExerciseInfo
+from app.schemas.session import SessionExerciseInfo
 
 def start_session(workout_id: int, session: Session) -> SessionStartResponse:
     workout = session.get(Workout, workout_id)
@@ -26,11 +26,6 @@ def start_session(workout_id: int, session: Session) -> SessionStartResponse:
     exercise_list = []
     for workout_exercise in workout_exercises:
         exercise_definition = session.get(ExerciseDefinition, workout_exercise.exercise_def_id)
-        exercise_list.append(WorkoutExerciseInfo(
-            name=exercise_definition.name,
-            planned_sets=workout_exercise.planned_sets,
-            planned_reps=workout_exercise.planned_reps
-        ))
 
         # Create a new session exercise entry
         new_session_exercise = SessionExercise(
@@ -40,7 +35,17 @@ def start_session(workout_id: int, session: Session) -> SessionStartResponse:
             planned_sets=workout_exercise.planned_sets,
             planned_reps=workout_exercise.planned_reps
         )
+
         session.add(new_session_exercise)
+        session.flush()  # Flush to get the ID of the new session exercise
+        session.refresh(new_session_exercise)
+
+        exercise_list.append(SessionExerciseInfo(
+            session_exercise_id=new_session_exercise.id,
+            name=exercise_definition.name,
+            planned_sets=workout_exercise.planned_sets,
+            planned_reps=workout_exercise.planned_reps
+        ))
 
     session.commit()
 
