@@ -15,3 +15,20 @@ class SessionStartResponse(SQLModel):
     program_day: int
     comments: Optional[str]
     exercises: List[SessionExerciseInfo]
+
+class PreviousSetInfo(SQLModel):
+    set_number: int
+    reps: int
+    weight: float
+    is_pr: bool
+
+class PreviousExerciseInfo(SQLModel):
+    name: str
+    sets: List[PreviousSetInfo]
+
+class PreviousSessionResponse(SQLModel):
+    session_date: datetime
+    program_name: str
+    program_day: int
+    comments: Optional[str]
+    exercises: List[PreviousExerciseInfo]

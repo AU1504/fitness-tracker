@@ -1,3 +1,5 @@
+from app.models.pr import Pr
+from app.models.workout_set import WorkoutSet
 from sqlmodel import Session, select
 from app.models.workout import Workout
 from app.models.program import Program
@@ -5,7 +7,7 @@ from app.models.workout_exercise import WorkoutExercise
 from app.models.session import Session as WorkoutSession
 from app.models.session_exercise import SessionExercise
 from app.models.exercise_definition import ExerciseDefinition
-from app.schemas.session import SessionStartResponse
+from app.schemas.session import PreviousExerciseInfo, PreviousSessionResponse, PreviousSetInfo, SessionStartResponse
 from app.schemas.session import SessionExerciseInfo
 
 def start_session(workout_id: int, session: Session) -> SessionStartResponse:
@@ -57,3 +59,56 @@ def start_session(workout_id: int, session: Session) -> SessionStartResponse:
         comments=workout.comments,
         exercises=exercise_list
     )
+
+def get_previous_session(session_id: int, session: Session) -> PreviousSessionResponse:
+    workout_session = session.get(WorkoutSession, session_id)
+
+    if not workout_session:
+        raise ValueError(f"Session with id {session_id} not found")
+    
+    workout = session.get(Workout, workout_session.workout_id)
+
+    previous_session = session.exec(select(WorkoutSession).where(
+        (WorkoutSession.workout_id == workout.id) & 
+        (WorkoutSession.id != workout_session.id)
+    ).order_by(WorkoutSession.date.desc())).first()
+
+    if not previous_session:
+        raise ValueError(f"No previous session found for workout with id {workout.id}")
+    
+    program = session.get(Program, workout.program_id)
+    previous_session_exercises = session.exec(select(SessionExercise).where(SessionExercise.session_id == previous_session.id).order_by(SessionExercise.exercise_order)).all()
+
+    previous_exercises = []
+  
+    for exercise in previous_session_exercises:
+        set_list = []
+        exercise_definition = session.get(ExerciseDefinition, exercise.exercise_def_id)
+        workout_sets = session.exec(select(WorkoutSet).where(WorkoutSet.session_exercise_id == exercise.id)).all()
+
+        for set_number, workout_set in enumerate(workout_sets, start=1):
+            pr_record = session.exec(select(Pr).where(Pr.set_id == workout_set.id)).first()
+            is_pr = pr_record is not None
+
+            previous_set_info = PreviousSetInfo(
+                set_number=set_number,
+                reps=workout_set.reps,
+                weight=workout_set.weight,
+                is_pr=is_pr
+            )
+            set_list.append(previous_set_info)
+        
+        previous_exercise_info = PreviousExerciseInfo(
+            name=exercise_definition.name,
+            sets=set_list
+        )
+
+        previous_exercises.append(previous_exercise_info)
+
+    return PreviousSessionResponse(
+        session_date=previous_session.date,
+        program_name=program.name,
+        program_day=workout.program_day,
+        comments=workout.comments,
+        exercises=previous_exercises
+    ) 
