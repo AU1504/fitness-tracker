@@ -4,11 +4,13 @@ from sqlmodel import SQLModel
 from app.database.session import engine
 from app.routes.workout import router as workout_router
 from app.routes.session import router as session_router
+from app.routes.set import router as set_router
 
 
 app = FastAPI()
 app.include_router(workout_router)
 app.include_router(session_router)  # Include the session router
+app.include_router(set_router)  # Include the set router
 
 @app.get("/")
 async def root():
