@@ -1,3 +1,5 @@
+from app.models.exercise_definition import ExerciseDefinition
+from app.schemas.pr import PRResponse
 from sqlmodel import Session, select
 from app.models.pr import Pr
 from app.models.user import User
@@ -30,3 +32,20 @@ def check_and_create_pr(session: Session, user_id: int, exercise_def_id: int, se
         return True  # New PR created
 
     return False  # No new PR created
+
+def get_all_prs(session: Session, user_id: int) -> list[PRResponse]:
+    prs = session.exec(
+        select(Pr).where(Pr.user_id == user_id)
+    ).all()
+    
+    pr_responses = []
+    for pr in prs:
+        workout_set = session.get(WorkoutSet, pr.set_id)
+        exercise_def = session.get(ExerciseDefinition, pr.exercise_def_id)
+        pr_responses.append(PRResponse(
+            exercise_name=exercise_def.name,
+            pr_date=pr.date,
+            pr_weight=workout_set.weight
+        ))
+        
+    return pr_responses
