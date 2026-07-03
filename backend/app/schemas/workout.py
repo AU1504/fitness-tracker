@@ -11,3 +11,9 @@ class WorkoutDetailResponse(SQLModel):
     program_day: int
     comments: Optional[str]
     exercises: List[WorkoutExerciseInfo]
+
+class NextWorkoutResponse(SQLModel):
+    workout_id: int
+    program_name: str
+    program_day: int
+    comments: Optional[str]

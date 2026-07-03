@@ -1,3 +1,4 @@
+from app.models.user_program import UserProgram
 from sqlmodel import Session, select
 from app.database.session import engine
 from app.models.exercise_definition import ExerciseDefinition
@@ -146,13 +147,24 @@ def seed_workout_exercises(session: Session, workouts: dict[str, Workout], exerc
                 )
                 session.add(new_workout_exercise)
 
-    session.commit()    
+    session.commit() 
+
+def seed_user_program(session: Session, user: User, program: Program) -> None:
+    existing_user_program = session.exec(
+        select(UserProgram).where(UserProgram.user_id == user.id, UserProgram.program_id == program.id)
+    ).first()
+
+    if not existing_user_program:
+        user_program = UserProgram(user_id=user.id, program_id=program.id, week = 1, progression=1)
+        session.add(user_program)
+        session.commit()   
 
 def run_seed():
     with Session(engine) as session:
         exercises = seed_exercises(session)
         user = seed_user(session)
         program = seed_program(session)
+        seed_user_program(session, user, program)
         workout_lookup = seed_workouts(session, program)
         seed_workout_exercises(session, workout_lookup, exercises)
 
