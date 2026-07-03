@@ -130,3 +130,18 @@ The MVP exercise library is functional only:
 * Movement patterns
 
 Reference content like videos and AI-recommended resources is intentionally delayed until V4.
+
+## Amendment - 2026-07-02
+
+### Weekly Volume Tracking moved to V2
+
+Originally an MVP feature, weekly volume tracking has been moved to V2 alongside charts and progress visualization.
+
+**Reasoning:** Weekly volume is an analytics feature most useful in a dashboard context. The core MVP workout loop — starting sessions, logging sets, detecting PRs, and viewing previous performance — is complete without it. Building volume tracking now would add backend complexity without a corresponding frontend to display it until V2 anyway.
+
+The MVP backend feature set is now considered complete with the following endpoints delivered:
+- GET /workouts/{id}
+- POST /workouts/{workout_id}/start
+- POST /sessions/{session_id}/sets
+- GET /sessions/{session_id}/previous
+- GET /users/{user_id}/prs
