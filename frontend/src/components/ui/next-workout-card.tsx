@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { useState, useEffect } from 'react'
 import { getNextWorkout, getWorkoutDetails } from '@/lib/api'
 import type { NextWorkoutResponse, WorkoutDetailResponse } from '@/lib/api'
+import { useRouter } from 'next/navigation'
 
 const DAY_LABELS: Record<number, string> = {
   1: 'Push Day',
@@ -16,6 +17,8 @@ export function NextWorkoutCard() {
   const [nextWorkout, setNextWorkout] = useState<NextWorkoutResponse | null>(null)
   const [workoutDetail, setWorkoutDetail] = useState<WorkoutDetailResponse | null>(null)
   const [loading, setLoading] = useState(true)
+
+  const router = useRouter()
 
   useEffect(() => {
     getNextWorkout()
@@ -58,9 +61,10 @@ export function NextWorkoutCard() {
         ))}
       </ul>
 
-      <Button size="lg" className="mt-5 h-12 w-full rounded-2xl text-base font-semibold shadow-sm">
-        <Play className="size-5 fill-current" aria-hidden="true" />
-        Start Workout
+      <Button size="lg" className="mt-5 h-12 w-full rounded-2xl text-base font-semibold shadow-sm"
+        onClick={() => router.push(`/workout/${nextWorkout.workout_id}`)}>
+          <Play className="size-5 fill-current" aria-hidden="true" />
+          Start Workout
       </Button>
     </section>
   )
