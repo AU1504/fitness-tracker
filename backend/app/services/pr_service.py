@@ -37,9 +37,17 @@ def get_all_prs(session: Session, user_id: int) -> list[PRResponse]:
     prs = session.exec(
         select(Pr).where(Pr.user_id == user_id)
     ).all()
-    
+
+    # Keep only the most recent PR per exercise
+    seen_exercises = set()
+    unique_prs = []
+    for pr in reversed(prs):
+        if pr.exercise_def_id not in seen_exercises:
+            seen_exercises.add(pr.exercise_def_id)
+            unique_prs.append(pr)
+
     pr_responses = []
-    for pr in prs:
+    for pr in unique_prs:
         workout_set = session.get(WorkoutSet, pr.set_id)
         exercise_def = session.get(ExerciseDefinition, pr.exercise_def_id)
         pr_responses.append(PRResponse(
@@ -47,5 +55,5 @@ def get_all_prs(session: Session, user_id: int) -> list[PRResponse]:
             pr_date=pr.date,
             pr_weight=workout_set.weight
         ))
-        
+
     return pr_responses

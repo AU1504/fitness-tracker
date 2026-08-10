@@ -112,3 +112,37 @@ def get_previous_session(session_id: int, session: Session) -> PreviousSessionRe
         comments=workout.comments,
         exercises=previous_exercises
     ) 
+
+def get_session(session_id: int, session: Session) -> SessionStartResponse:
+    workout_session = session.get(WorkoutSession, session_id)
+    if not workout_session:
+        raise ValueError(f"Session with id {session_id} not found")
+    curr_workout = session.get(Workout, workout_session.workout_id)  # Ensure the workout is loaded
+    curr_program = session.get(Program, curr_workout.program_id)  # Ensure the program is loaded
+
+    session_exercises = session.exec(
+    select(SessionExercise)
+    .where(SessionExercise.session_id == session_id)
+    .order_by(SessionExercise.exercise_order)
+    ).all()
+
+    exercise_list = []
+    for se in session_exercises:
+        exercise_def = session.get(ExerciseDefinition, se.exercise_def_id)
+        exercise_list.append(SessionExerciseInfo(
+            session_exercise_id=se.id,
+            name=exercise_def.name,
+            planned_sets=se.planned_sets,
+            planned_reps=se.planned_reps
+        ))
+
+    return SessionStartResponse(
+        session_id=workout_session.id,
+        date=workout_session.date,
+        program_name=curr_program.name,
+        program_day=curr_workout.program_day,
+        comments=curr_workout.comments,
+        exercises=exercise_list
+    )
+
+

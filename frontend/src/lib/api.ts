@@ -114,7 +114,11 @@ export async function submitSet(sessionId: number, session_exercise_id: number, 
             session_exercise_id,
             reps,
             weight,
-            comments,
+            comments, 
         }),
     })
+}
+
+export async function getSession(sessionId: number): Promise<SessionStartResponse> {
+  return apiFetch<SessionStartResponse>(`/sessions/${sessionId}`)
 }
