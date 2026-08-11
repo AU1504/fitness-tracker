@@ -12,7 +12,8 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Adjust this to your frontend's origin in production
+    allow_origins=["http://localhost:3000",
+                   "https://fitness-tracker-wine-seven.vercel.app"],  # Adjust this to your frontend's origin in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
