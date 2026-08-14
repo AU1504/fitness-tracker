@@ -1,18 +1,21 @@
 'use client'
 
-import { useState } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
 import { Home, History, Trophy, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navItems = [
-  { id: 'home', label: 'Home', icon: Home },
-  { id: 'history', label: 'History', icon: History },
-  { id: 'prs', label: 'PRs', icon: Trophy },
-  { id: 'settings', label: 'Settings', icon: Settings },
-]
+    { id: 'home', label: 'Home', icon: Home, path: '/' },
+    { id: 'history', label: 'History', icon: History, path: '/history' },
+    { id: 'prs', label: 'PRs', icon: Trophy, path: '/prs' },
+    { id: 'settings', label: 'Settings', icon: Settings, path: '/settings' },
+  ]
+
 
 export function BottomNav() {
-  const [active, setActive] = useState('home')
+  
+  const router = useRouter()
+  const pathname = usePathname()
 
   return (
     <nav
@@ -22,12 +25,12 @@ export function BottomNav() {
       <ul className="mx-auto flex max-w-md items-stretch justify-around px-2 pb-[env(safe-area-inset-bottom)]">
         {navItems.map((item) => {
           const Icon = item.icon
-          const isActive = active === item.id
+          const isActive = pathname === item.path
           return (
             <li key={item.id} className="flex-1">
               <button
                 type="button"
-                onClick={() => setActive(item.id)}
+                onClick={() => router.push(item.path)}
                 aria-current={isActive ? 'page' : undefined}
                 className={cn(
                   'flex w-full flex-col items-center gap-1 py-2.5 text-xs font-medium transition-colors',
